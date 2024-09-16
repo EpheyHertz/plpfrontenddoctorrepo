@@ -4,29 +4,28 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const SignUp = () => {
-  const [isMounted, setIsMounted] = useState(false); // New state to track if the component is mounted
+  const [isMounted, setIsMounted] = useState(false); // Track component mounting
   const [userType, setUserType] = useState("patient");
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    licenseNumber: "",
-    specialization: "",
-    dob: "",
-    symptoms: "",
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    licenseNumber: '',
+    specialization: '',
+    dob: ''
   });
 
   const router = useRouter();
 
-  // useEffect to set the component as mounted after the first render
+  // Ensure component renders on the client side
   useEffect(() => {
-    setIsMounted(true); // Now we know we're on the client-side
+    setIsMounted(true);
   }, []);
 
-  // Don't render anything until the component is mounted (client-side)
+  // Prevent rendering on the server side until fully mounted on client
   if (!isMounted) {
-    return null; // Avoid rendering on the server
+    return null;
   }
 
   const handleChange = (e) => {
@@ -40,43 +39,31 @@ const SignUp = () => {
       name: formData.name,
       email: formData.email,
       password: formData.password,
-      ...(userType === "doctor" && {
-        licenseNumber: formData.licenseNumber,
-        specialization: formData.specialization,
-      }),
-      ...(userType === "patient" && {
-        dob: formData.dob,
-        symptoms: formData.symptoms,
-      }),
+      ...(userType === 'doctor' && { licenseNumber: formData.licenseNumber, specialization: formData.specialization }),
+      ...(userType === 'patient' && { dob: formData.dob })
     };
 
     try {
-      const response = await fetch("/apis/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+      const response = await fetch('/apis/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
       });
 
       if (response.ok) {
-        router.push("/profile/update"); // Redirect to profile update page
+        router.push('/login'); // 👈 Redirect to login page after successful sign-up
       } else {
-        console.error("Sign-up failed");
+        console.error('Sign-up failed');
       }
     } catch (error) {
-      console.error("An error occurred:", error);
+      console.error('An error occurred:', error);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="max-w-md w-full bg-white shadow-md rounded-lg p-8">
-        <h1 className="text-2xl font-bold text-center mb-4">
-          Sign Up for AI Doctor
-        </h1>
-        <p className="text-center text-gray-500 mb-6">
-          Connect with an AI-powered system to get personalized health advice.
-          If needed, schedule a call with a doctor directly.
-        </p>
+        <h1 className="text-2xl font-bold text-center mb-4">Sign Up</h1>
 
         {/* Toggle between Doctor and Patient */}
         <div className="mb-4">
@@ -84,8 +71,7 @@ const SignUp = () => {
           <select
             value={userType}
             onChange={(e) => setUserType(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-lg"
-          >
+            className="w-full p-2 border border-gray-300 rounded-lg">
             <option value="patient">Patient</option>
             <option value="doctor">Doctor</option>
           </select>
@@ -104,7 +90,7 @@ const SignUp = () => {
               className="w-full p-2 border border-gray-300 rounded-lg"
             />
           </div>
-
+          
           <div className="mb-4">
             <label className="block text-gray-700">Email</label>
             <input
@@ -116,7 +102,7 @@ const SignUp = () => {
               className="w-full p-2 border border-gray-300 rounded-lg"
             />
           </div>
-
+          
           <div className="mb-4">
             <label className="block text-gray-700">Password</label>
             <input
@@ -128,7 +114,7 @@ const SignUp = () => {
               className="w-full p-2 border border-gray-300 rounded-lg"
             />
           </div>
-
+          
           <div className="mb-4">
             <label className="block text-gray-700">Confirm Password</label>
             <input
@@ -142,12 +128,10 @@ const SignUp = () => {
           </div>
 
           {/* Conditional Fields for Doctor */}
-          {userType === "doctor" && (
+          {userType === 'doctor' && (
             <>
               <div className="mb-4">
-                <label className="block text-gray-700">
-                  Medical License Number
-                </label>
+                <label className="block text-gray-700">Medical License Number</label>
                 <input
                   type="text"
                   name="licenseNumber"
@@ -173,7 +157,7 @@ const SignUp = () => {
           )}
 
           {/* Conditional Fields for Patient */}
-          {userType === "patient" && (
+          {userType === 'patient' && (
             <>
               <div className="mb-4">
                 <label className="block text-gray-700">Date of Birth</label>
@@ -186,25 +170,10 @@ const SignUp = () => {
                   className="w-full p-2 border border-gray-300 rounded-lg"
                 />
               </div>
-
-              <div className="mb-4">
-                <label className="block text-gray-700">
-                  Symptoms (optional)
-                </label>
-                <textarea
-                  name="symptoms"
-                  value={formData.symptoms}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-lg"
-                />
-              </div>
             </>
           )}
 
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded-lg"
-          >
+          <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded-lg">
             Sign Up
           </button>
         </form>
